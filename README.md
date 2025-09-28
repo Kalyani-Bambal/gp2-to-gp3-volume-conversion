@@ -1,86 +1,91 @@
-# gp2-to-gp3-volume-conversion
+# 🚀 gp2-to-gp3-volume-conversion
 
-## Description
-This project automates the conversion of AWS EBS volumes from **GP2** to **GP3** when a volume is created with the wrong type. The solution uses AWS Lambda to monitor and modify volume types based on CloudWatch and EventBridge events. This ensures that all EBS volumes follow the company's standard practice of using **GP3** volumes, enhancing consistency and reducing manual intervention.
+> Automatically enforce your organization's EBS volume policy by converting all `gp2` volumes to `gp3` — seamlessly and automatically using AWS Lambda, EventBridge, and CloudWatch.
 
-## Problem Statement
-To enforce the company's policy of using **GP3** for all new EBS volumes, this project automatically converts any newly created **GP2** volumes into **GP3** volumes using AWS Lambda. This process is triggered by AWS CloudWatch events and routed through EventBridge.
+---
 
-## Architecture & Services Used
-- **AWS Lambda**: Executes the conversion logic (written in Python) to automatically modify the volume type from **GP2** to **GP3**.
-- **AWS CloudWatch**: Monitors events related to EBS volume creation.
-- **AWS EventBridge**: Routes CloudWatch events to trigger the Lambda function.
+## 📘 Table of Contents
 
-## How It Works
-1. **CloudWatch Event**: A new volume creation event is sent to CloudWatch.
-2. **EventBridge Rule**: The CloudWatch event is routed through EventBridge.
-3. **Lambda Function**: The Lambda function receives the event, checks if the volume is of type **GP2**, and converts it to **GP3**.
-4. **Volume Conversion**: If the volume is a **GP2**, the Lambda function triggers the conversion process to change it to **GP3**.
+- [📖 Project Overview](#-project-overview)
+- [⚙️ Architecture & AWS Services Used](#-architecture--aws-services-used)
+- [🧠 How It Works](#-how-it-works)
+- [🚀 Deployment Guide](#-deployment-guide)
+- [🧾 IAM Permissions](#-iam-permissions)
+- [✅ Benefits](#-benefits)
+- [🔮 Future Enhancements](#-future-enhancements)
+- [📝 License](#-license)
+- [🙋‍♀️ Author](#-author)
 
-## Setup Instructions
-Follow these steps to deploy the solution in your AWS environment:
+---
+## 📁 Project Structure
 
-### 1. **Create an EventBridge Rule** to monitor volume creation events:
-- Go to the **EventBridge** service in AWS Management Console.
-- Create a new **rule** to capture EC2 volume creation events.
-- The event pattern should capture events like `CreateVolume`.
+gp2-to-gp3-volume-conversion/
+├── lambda.py # Main AWS Lambda function code
+├── README.md # Project documentation
+├── architecture-diagram.png # AWS architecture image
+---
+## 📖 Project Overview
 
-### 2. **Create the Lambda Function**:
-- Go to the **Lambda** service in the AWS Console.
-- Create a new Lambda function using Python 3.8+ as the runtime.
-- Assign the function an IAM role with permissions to modify EBS volumes (`ec2:ModifyVolume` and `ec2:DescribeVolumes`).
+When new developers join or unintentionally create EBS volumes with type `gp2`, this project ensures such volumes are **automatically converted to `gp3`**, maintaining the company's infrastructure compliance and cost-efficiency standards.
 
-### 3. **Write the Lambda Code**:
-Use the following code in your Lambda function to detect and convert GP2 volumes to GP3.
+This automation reduces manual oversight, ensures consistency, and follows best practices for EBS volume management.
 
-```python
-import boto3
+---
+# Architecture Diagrams
+<img width="1536" height="1024" alt="gp2-gp3-diagram" src="https://github.com/user-attachments/assets/329be3ae-1277-4df7-8506-a436022300c0" />
+---
 
-def lambda_handler(event, context):
-    ec2 = boto3.client('ec2')
-    
-    # Extract volume ID from the event
-    volume_id = event['detail']['responseElements']['volumeId']
-    
-    # Describe volume to check type
-    response = ec2.describe_volumes(VolumeIds=[volume_id])
-    volume = response['Volumes'][0]
-    
-    if volume['VolumeType'] == 'gp2':
-        # Initiate volume type modification to GP3
-        ec2.modify_volume(VolumeId=volume_id, VolumeType='gp3')
-        print(f"Volume {volume_id} converted from GP2 to GP3")
-    else:
-        print(f"Volume {volume_id} is already GP3")
-4. Assign IAM Role to Lambda:
-Ensure the Lambda function has an IAM role with the following permissions:
+## ⚙️ Architecture & AWS Services Used
 
-ec2:DescribeVolumes
+This solution is built entirely with serverless components:
 
-ec2:ModifyVolume
+- **AWS Lambda**: Python function that performs the `gp2 → gp3` conversion.
+- **Amazon EventBridge**: Triggers the Lambda function on EBS volume creation.
+- **Amazon CloudWatch**:  Detects EBS volume creation events.
 
-5. Link the Lambda Function to EventBridge:
-In EventBridge, create a new target that triggers the Lambda function whenever a volume creation event is detected.
+---
 
-6. Test the Setup:
-Create a volume in AWS and check if the Lambda function is triggered automatically to convert GP2 to GP3.
+## 🧠 How It Works
 
-Example EventBridge Rule for CloudWatch Event Pattern
-json
-Copy code
+1. A developer creates an EBS volume via console, CLI, or API.
+2.  **CloudWatch** captures this event and forwards it via **EventBridge**.
+3. **EventBridge** detects this event and routes it to **Lambda**.
+4. **Lambda** checks if the volume is of type `gp2`:
+   - If yes, it calls `ModifyVolume` to convert it to `gp3`.
+   - If not, it exits without changes.
+
+---
+
+## 🚀 Deployment Guide
+
+### 🔹 Step 1: Create the EventBridge Rule
+
+In AWS Console → **EventBridge**:
+
+- Create a new rule that listens to volume creation events.
+- Use the following event pattern:
+
+```json
 {
   "source": ["aws.ec2"],
-  "detail-type": ["AWS API Call via CloudTrail"],
+  "detail-type": ["EC2 Volume State-change Notification"],
   "detail": {
-    "eventSource": ["ec2.amazonaws.com"],
-    "eventName": ["CreateVolume"]
+    "state": ["available"]
   }
 }
-IAM Permissions for Lambda
-Ensure that your Lambda role includes the following permissions:
+```
+---
+🔹 Step 2: Create the Lambda Function
 
-json
-Copy code
+    *Runtime: Python 3.8 or above
+
+    *Permissions: Attach an IAM role with the permissions described below
+            
+---
+🔹 Step 3: Assign IAM Role to Lambda
+
+Attach a policy to allow Lambda to describe and modify volumes.
+```bash
 {
   "Version": "2012-10-17",
   "Statement": [
@@ -94,21 +99,64 @@ Copy code
     }
   ]
 }
-Advantages
-Automated Volume Type Management: Eliminates the need for manual volume type adjustments.
+```
+---
+🔹 Step 4: Connect Lambda to EventBridge
 
-Cost-Effective: GP3 volumes are more cost-effective than GP2 while offering better performance.
+   *In EventBridge, set the target of your rule to the Lambda function created.
 
-Scalable: The system can easily scale with your AWS infrastructure, and new volume types can be added by modifying the Lambda logic.
+   *Enable the rule. 
+---
+🔹 Step 5: Test the Setup
 
-Future Enhancements
-Logging and monitoring of volume conversions for auditing.
+1.Manually create an EBS volume using the gp2 type.
 
-Notifications via SNS to alert admins if the conversion fails.
+2.Wait a few seconds.
 
-Integration with AWS Config to track compliance with volume type policies.
+3.Confirm:
 
-License
-This project is licensed under the MIT License - see the LICENSE file for details.
+ -The Lambda function is triggered.
 
+ -The volume is modified to gp3 automatically.
+---
+🧾 IAM Permissions
 
+Ensure the Lambda function's execution role includes:
+
+  *ec2:DescribeVolumes
+
+  *ec2:ModifyVolume
+
+You can expand this policy for logging, monitoring, or further automation.  
+---
+✅ Benefits
+
+-🛡️ Enforces Standards: Ensures all volumes use gp3 as per company policy.
+
+-💸 Cost-Efficient: gp3 offers better performance at a lower price.
+
+-⚙️ Fully Automated: No manual intervention required.
+
+-🧱 Scalable & Reliable: Works across all regions and teams.    
+---
+🔮 Future Enhancements
+
+📊 Logging to CloudWatch Logs for audit.
+
+📩 SNS notifications for conversion success/failure.
+
+🔐 Tag-based filtering to exclude specific volumes.
+
+📏 AWS Config integration for compliance tracking.
+
+ ### 🔄 Before & After Conversion
+
+- **Before:** Developer creates `EBS Volume (gp2)`
+
+<img width="1165" height="583" alt="Before-Volume-Snap-gp2" src="https://github.com/user-attachments/assets/229b983b-cf33-40fd-bd62-64256ee367bc" />
+
+- **After:** Automation ensures it becomes `EBS Volume (gp3)`
+
+<img width="1154" height="562" alt="After-Volume-Snap-gp3" src="https://github.com/user-attachments/assets/ea46c677-3e59-4f0b-8e52-5156d8883d43" />
+
+    
