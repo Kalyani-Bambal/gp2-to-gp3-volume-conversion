@@ -20,12 +20,13 @@
 
 ## 📁 Project Structure
 
----
+```
 gp2-to-gp3-volume-conversion/
 ├── lambda.py # Main AWS Lambda function code
 ├── README.md # Project documentation
 ├── architecture-diagram.png # AWS architecture image
 
+```
 ---
 
 ## 📖 Project Overview
@@ -82,16 +83,19 @@ In AWS Console → **EventBridge**:
 }
 ```
 ---
+
 🔹 Step 2: Create the Lambda Function
 
-    *Runtime: Python 3.8 or above
+- **Runtime**: Python 3.8 or above
 
-    *Permissions: Attach an IAM role with the permissions described below
+- **Permissions**: Attach an IAM role with the permissions described below
             
 ---
+
 🔹 Step 3: Assign IAM Role to Lambda
 
 Attach a policy to allow Lambda to describe and modify volumes.
+
 ```bash
 {
   "Version": "2012-10-17",
@@ -108,12 +112,15 @@ Attach a policy to allow Lambda to describe and modify volumes.
 }
 ```
 ---
+
 🔹 Step 4: Connect Lambda to EventBridge
 
-   *In EventBridge, set the target of your rule to the Lambda function created.
+ - In EventBridge, set the target of your rule to the Lambda function created.
 
-   *Enable the rule. 
+ - Enable the rule. 
+
 ---
+
 🔹 Step 5: Test the Setup
 
 1.Manually create an EBS volume using the gp2 type.
@@ -122,21 +129,25 @@ Attach a policy to allow Lambda to describe and modify volumes.
 
 3.Confirm:
 
- -The Lambda function is triggered.
+ - The Lambda function is triggered.
 
- -The volume is modified to gp3 automatically.
+ - The volume is modified to gp3 automatically.
+
 ---
+
 🧾 IAM Permissions
 
-Ensure the Lambda function's execution role includes:
+ Ensure the Lambda function's execution role includes:
 
-  *ec2:DescribeVolumes
+  - ec2:DescribeVolumes
 
-  *ec2:ModifyVolume
+  - ec2:ModifyVolume
 
 You can expand this policy for logging, monitoring, or further automation.  
+
 ---
-✅ Benefits
+
+# ✅ Benefits
 
 -🛡️ Enforces Standards: Ensures all volumes use gp3 as per company policy.
 
@@ -145,8 +156,10 @@ You can expand this policy for logging, monitoring, or further automation.
 -⚙️ Fully Automated: No manual intervention required.
 
 -🧱 Scalable & Reliable: Works across all regions and teams.    
+
 ---
-🔮 Future Enhancements
+
+# 🔮 Future Enhancements
 
 📊 Logging to CloudWatch Logs for audit.
 
@@ -156,14 +169,20 @@ You can expand this policy for logging, monitoring, or further automation.
 
 📏 AWS Config integration for compliance tracking.
 
+---
+
  ### 🔄 Before & After Conversion
 
+---
 - **Before:** Developer creates `EBS Volume (gp2)`
-
+```
 <img width="1165" height="583" alt="Before-Volume-Snap-gp2" src="https://github.com/user-attachments/assets/229b983b-cf33-40fd-bd62-64256ee367bc" />
+```
+---
 
 - **After:** Automation ensures it becomes `EBS Volume (gp3)`
-
+---
+```
 <img width="1154" height="562" alt="After-Volume-Snap-gp3" src="https://github.com/user-attachments/assets/ea46c677-3e59-4f0b-8e52-5156d8883d43" />
-
-    
+```
+---   
