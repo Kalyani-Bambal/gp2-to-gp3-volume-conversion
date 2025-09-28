@@ -17,13 +17,17 @@
 - [🙋‍♀️ Author](#-author)
 
 ---
+
 ## 📁 Project Structure
 
+---
 gp2-to-gp3-volume-conversion/
 ├── lambda.py # Main AWS Lambda function code
 ├── README.md # Project documentation
 ├── architecture-diagram.png # AWS architecture image
+
 ---
+
 ## 📖 Project Overview
 
 When new developers join or unintentionally create EBS volumes with type `gp2`, this project ensures such volumes are **automatically converted to `gp3`**, maintaining the company's infrastructure compliance and cost-efficiency standards.
@@ -31,8 +35,11 @@ When new developers join or unintentionally create EBS volumes with type `gp2`, 
 This automation reduces manual oversight, ensures consistency, and follows best practices for EBS volume management.
 
 ---
+
 # Architecture Diagrams
+
 <img width="1536" height="1024" alt="gp2-gp3-diagram" src="https://github.com/user-attachments/assets/329be3ae-1277-4df7-8506-a436022300c0" />
+
 ---
 
 ## ⚙️ Architecture & AWS Services Used
