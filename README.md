@@ -84,7 +84,7 @@ In AWS Console → **EventBridge**:
 ```
 ---
 
-🔹 Step 2: Create the Lambda Function
+### 🔹 Step 2: Create the Lambda Function
 
 - **Runtime**: Python 3.8 or above
 
@@ -92,7 +92,7 @@ In AWS Console → **EventBridge**:
             
 ---
 
-🔹 Step 3: Assign IAM Role to Lambda
+### 🔹 Step 3: Assign IAM Role to Lambda
 
 Attach a policy to allow Lambda to describe and modify volumes.
 
@@ -113,7 +113,7 @@ Attach a policy to allow Lambda to describe and modify volumes.
 ```
 ---
 
-🔹 Step 4: Connect Lambda to EventBridge
+### 🔹 Step 4: Connect Lambda to EventBridge
 
  - In EventBridge, set the target of your rule to the Lambda function created.
 
@@ -121,7 +121,7 @@ Attach a policy to allow Lambda to describe and modify volumes.
 
 ---
 
-🔹 Step 5: Test the Setup
+### 🔹 Step 5: Test the Setup
 
 1.Manually create an EBS volume using the gp2 type.
 
@@ -135,7 +135,7 @@ Attach a policy to allow Lambda to describe and modify volumes.
 
 ---
 
-🧾 IAM Permissions
+# 🧾 IAM Permissions
 
  Ensure the Lambda function's execution role includes:
 
@@ -175,14 +175,14 @@ You can expand this policy for logging, monitoring, or further automation.
 
 ---
 - **Before:** Developer creates `EBS Volume (gp2)`
-```
+
 <img width="1165" height="583" alt="Before-Volume-Snap-gp2" src="https://github.com/user-attachments/assets/229b983b-cf33-40fd-bd62-64256ee367bc" />
-```
+
 ---
 
 - **After:** Automation ensures it becomes `EBS Volume (gp3)`
 ---
-```
+
 <img width="1154" height="562" alt="After-Volume-Snap-gp3" src="https://github.com/user-attachments/assets/ea46c677-3e59-4f0b-8e52-5156d8883d43" />
-```
+
 ---   
